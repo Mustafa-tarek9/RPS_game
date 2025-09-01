@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Django</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .score {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .score span {
+            font-size: 2em;
+            display: block;
+            color: #e74c3c;
+            margin-top: 5px;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .choice {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 2em;
+            color: white;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .choice:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .choice:active {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .result h3 {
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .choices-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .choice-icon {
+            font-size: 3em;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-20px);
+            }
+
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .vs {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .outcome {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .win {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .lose {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tie {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .django-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .django-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .choices {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .choice {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .choices-display {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .vs {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1>🪨 📄 ✂️ Rock Paper Scissors</h1>
+
+        <div class="score-board">
+            <div class="score">
+                Player Score
+                <span id="player-score">0</span>
+            </div>
+            <div class="score">
+                Computer Score
+                <span id="computer-score">0</span>
+            </div>
+            <div class="score">
+                Ties
+                <span id="tie-score">0</span>
+            </div>
+        </div>
+
+        <div class="choices">
+            <button class="choice" onclick="playGame('rock')">🪨</button>
+            <button class="choice" onclick="playGame('paper')">📄</button>
+            <button class="choice" onclick="playGame('scissors')">✂️</button>
+        </div>
+
+        <div class="result">
+            <h3>Round Result</h3>
+            <div class="choices-display" id="choices-display" style="display: none;">
+                <div class="player-choice">
+                    <div>Your Choice</div>
+                    <div class="choice-icon" id="player-choice-icon">🪨</div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="computer-choice">
+                    <div>Computer's Choice</div>
+                    <div class="choice-icon" id="computer-choice-icon">🪨</div>
+                </div>
+            </div>
+            <div class="outcome" id="outcome">Choose an option to play!</div>
+        </div>
+
+        <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+
+        <div class="django-info">
+            <h3>Powered by Django</h3>
+            <p>This Rock Paper Scissors game is served by Django's template system</p>
+        </div>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        let tieScore = 0;
+        let gameHistory = [];
+
+        const choices = ['rock', 'paper', 'scissors'];
+        const emojis = {
+            'rock': '🪨',
+            'paper': '📄',
+            'scissors': '✂️'
+        };
+
+        function playGame(playerChoice) {
+            const computerChoice = getComputerChoice();
+            const result = determineWinner(playerChoice, computerChoice);
+
+            // Update display
+            document.getElementById('player-choice-icon').textContent = emojis[playerChoice];
+            document.getElementById('computer-choice-icon').textContent = emojis[computerChoice];
+            document.getElementById('choices-display').style.display = 'flex';
+
+            // Update outcome
+            const outcomeEl = document.getElementById('outcome');
+            outcomeEl.className = 'outcome';
+
+            if (result === 'win') {
+                playerScore++;
+                outcomeEl.classList.add('win');
+                outcomeEl.textContent = 'You Win! ' + getWinMessage(playerChoice, computerChoice);
+            } else if (result === 'lose') {
+                computerScore++;
+                outcomeEl.classList.add('lose');
+                outcomeEl.textContent = 'You Lose! ' + getLoseMessage(playerChoice, computerChoice);
+            } else {
+                tieScore++;
+                outcomeEl.classList.add('tie');
+                outcomeEl.textContent = "It's a Tie!";
+            }
+
+            // Update scores
+            document.getElementById('player-score').textContent = playerScore;
+            document.getElementById('computer-score').textContent = computerScore;
+            document.getElementById('tie-score').textContent = tieScore;
+
+            // Add to history
+            gameHistory.push({
+                player: playerChoice,
+                computer: computerChoice,
+                result: result
+            });
+        }
+
+        function getComputerChoice() {
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choices[randomIndex];
+        }
+
+        function determineWinner(player, computer) {
+            if (player === computer) return 'tie';
+
+            if (
+                (player === 'rock' && computer === 'scissors') ||
+                (player === 'paper' && computer === 'rock') ||
+                (player === 'scissors' && computer === 'paper')
+            ) {
+                return 'win';
+            }
+
+            return 'lose';
+        }
+
+        function getWinMessage(player, computer) {
+            if (player === 'rock' && computer === 'scissors') return 'Rock crushes Scissors!';
+            if (player === 'paper' && computer === 'rock') return 'Paper covers Rock!';
+            if (player === 'scissors' && computer === 'paper') return 'Scissors cut Paper!';
+            return '';
+        }
+
+        function getLoseMessage(player, computer) {
+            if (player === 'rock' && computer === 'paper') return 'Paper covers Rock!';
+            if (player === 'paper' && computer === 'scissors') return 'Scissors cut Paper!';
+            if (player === 'scissors' && computer === 'rock') return 'Rock crushes Scissors!';
+            return '';
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            tieScore = 0;
+            gameHistory = [];
+
+            document.getElementById('player-score').textContent = '0';
+            document.getElementById('computer-score').textContent = '0';
+            document.getElementById('tie-score').textContent = '0';
+
+            document.getElementById('choices-display').style.display = 'none';
+            document.getElementById('outcome').textContent = 'Choose an option to play!';
+            document.getElementById('outcome').className = 'outcome';
+        }
+    </script>
+</body>
+
+</html>
